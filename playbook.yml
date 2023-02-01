@@ -1,0 +1,31 @@
+---
+- name: Install JDK 11 on Windows
+  hosts: windows
+  become: yes
+  become_method: runas
+  
+  tasks:
+  - name: Download OpenJDK JDK 11 ZIP archive
+    win_get_url:
+      url: https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.9_windows-x64_bin.zip
+      dest: C:\openjdk-11.0.9_windows-x64_bin.zip
+    register: openjdk_zip
+
+  - name: Extract OpenJDK ZIP archive
+    win_unzip:
+      src: C:\openjdk-11.0.9_windows-x64_bin.zip
+      dest: C:\Java
+      creates: C:\Java\jdk-11.0.9
+
+  - name: Set JAVA_HOME environment variable
+    win_environment:
+      name: JAVA_HOME
+      value: C:\Java\jdk-11.0.9
+
+  - name: Add JAVA_HOME to the PATH environment variable
+    win_environment:
+      name: PATH
+      value: "{{ '%JAVA_HOME%\\bin' }}"
+      state: present
+      action: append
+
